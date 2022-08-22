@@ -1,0 +1,34 @@
+.tec_form {
+	width:100%;
+	text-align:center;
+}
+.tec_form #tec_entry {
+	min-width: 50%;
+	padding: 10px 20px;
+	border-radius: 10px;
+}
+.tec_form #tec_feedback {
+	margin-top:10px;	
+}
+.tec_form #tec_submit {
+	margin-top:10px;
+	padding: 10px 20px;
+	border: solid 2px black;
+	border-radius: 10px;
+}
+
+.tec_loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    margin-left:auto;
+    margin-right:auto;
+    text-align: center;
+    animation: spin 2s linear infinite;
+} 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

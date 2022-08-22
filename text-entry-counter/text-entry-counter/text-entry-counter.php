@@ -11,25 +11,25 @@ Text Domain: Text Entry Counter
 */
 
 
-class JW_Main {
+class TEC_Main {
     public function __construct() {
         $this->initialise_button();
         $this->initialise_endpoints();
     }
     
     private function initialise_button() {
-        $FH = new JW_Form_Handler;
+        $FH = new TEC_Form_Handler;
         add_shortcode( 'text_entry_form', array( $FH, 'text_entry_form' ) );
     }
     
     private function initialise_endpoints() {
-        $EP = new JW_Endpoints;
+        $EP = new TEC_Endpoints;
     }
 }
 
 
-class JW_Database_Handler {
-    private $t_name = "text_entries";
+class TEC_Database_Handler {
+    private $t_name = "tec_text_entries";
     
     public function create_table_if_doesnt_exist () {
         global $wpdb;
@@ -96,7 +96,7 @@ class JW_Database_Handler {
 }
 
 
-class JW_Endpoints {
+class TEC_Endpoints {
     public function __construct() {
         $this->create_check_value();
     }
@@ -106,52 +106,33 @@ class JW_Endpoints {
         add_action( 'rest_api_init', function () {
             register_rest_route( 'passwords/v1', '/check', array(
                 'methods' => 'GET',
-                'callback' => array(new JW_Database_Handler, 'test_value')
+                'callback' => array(new TEC_Database_Handler, 'test_value')
             ));
         });
     }
 }
 
 
-class JW_Form_Handler {
+class TEC_Form_Handler {
     public function text_entry_form() {
-        $html = '
-        <!--HTML FORM-->
-        <div class="text_entry_container">
-            <input type="text" id="test_text_entry" placeholder="Entry your password here">
-            <p id="text_feedback">Enter a password above and click "Check Password" to test it against our database.</p>
-            <button id="submit_password_check">Check Password</button>
-        </div>
-        
-        <!--FUNCTION FOR ONCLICK EVENT IN FORM-->
-        <script type="text/javascript">
-            jQuery("#submit_password_check").click(function(){
-                jQuery.get("/wp-json/passwords/v1/check", {value: jQuery("#test_text_entry").val()}, function(data, status){
-                    feedback_field = jQuery("#text_feedback")
-                    if (data["status"] == "success") {
-                        count = data["data"]["calls"];
-                        if (count > 0) {
-                            feedback_field.html("Password found " + count + " times.");
-                        }
-                        else {
-                            feedback_field.html("Your password wasnt found. However it has now been added to the database.");
-                        }
-                    }
-                    else {
-                        feedback_field.html("Please provide a password in the text field.");
-                    }
-                });
-            }); 
-        </script>
-        ';
+        $html = file_get_contents( plugin_dir_url( __FILE__ ).'html/tec-form.html' );
         return $html;
     }
 }
 
 
-function run_at_activation () {
-    $DH = new JW_Database_Handler;
+//SETUP SECTION
+function tec_run_at_activation () {
+    $DH = new TEC_Database_Handler;
     $DH->create_table_if_doesnt_exist();
 }
-register_activation_hook( __FILE__, 'run_at_activation');
-new JW_Main;
+function tec_load_scripts() {
+    wp_enqueue_script( 'tec_script_1', plugin_dir_url( __FILE__ ).'js/tec-button-onclick.js', array('jquery') );
+    wp_enqueue_style( 'tec_stylesheet_1', plugin_dir_url( __FILE__ ).'css/tec-styles.css', array() );
+}
+register_activation_hook( __FILE__, 'tec_run_at_activation');
+add_action( 'wp_enqueue_scripts', 'tec_load_scripts' );
+//END SETUP SECTION
+
+
+new TEC_Main;
